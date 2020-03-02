@@ -6,7 +6,7 @@ class Provider(object):
     def __init__(self, config):
         self.config = config
 
-    def provide_lcd(self):
+    def provide(self):
         size = self.config['size'].split(",")
         driver_pins = [int(pin.strip()) for pin in self.config['pins'].split(",")]
         driver_pins.insert(0, int(size[1]))

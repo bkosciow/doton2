@@ -18,7 +18,7 @@ from service.config import Config
 GPIO.setmode(GPIO.BCM)
 
 config = Config()
-
+# config.init_touch(None)
 # broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 # address = (config.get('ip', '<broadcast>'), int(config.get('port')))

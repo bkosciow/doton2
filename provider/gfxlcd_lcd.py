@@ -1,4 +1,4 @@
-from .utils import *
+from service.utils import *
 from gfxlcd.driver.ili9486.spi import SPI
 from gfxlcd.driver.ili9486.ili9486 import ILI9486
 from gfxlcd.driver.ili9325.gpio import GPIO
@@ -9,7 +9,7 @@ class Provider(object):
     def __init__(self, config):
         self.config = config
 
-    def provide_lcd(self):
+    def provide(self):
         size = self.config['size'].split(",")
         drv = self._get_drv()
         lcd = None

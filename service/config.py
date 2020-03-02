@@ -36,11 +36,19 @@ class Config(object):
         path = lcd_config['provider']
         provider = getattr(import_module(path), "Provider")
         p = provider(lcd_config)
-        self.lcd = p.provide_lcd()
+        self.lcd = p.provide()
         if self.lcd is None:
-            raise UnsuportedLCD("Unsupported lcd")
+            raise UnsupportedLCD("Unsupported lcd")
 
         self.lcd.init()
+
+    def init_touch(self, callback):
+        touch_config = self.get_section(self.get("global.touch"))
+        if touch_config is not None:
+            path = touch_config['provider']
+            provider = getattr(import_module(path), "Provider")
+            p = provider(touch_config)
+            p.provide(callback)
 
     # def init_touch(self, callback):
     #     """dynamically load and init touch panel"""
@@ -67,5 +75,5 @@ class Config(object):
         return string_to_dict(value)
 
 
-class UnsuportedLCD(Exception):
+class UnsupportedLCD(Exception):
     pass
