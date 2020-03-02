@@ -31,7 +31,6 @@ class Config(object):
         return dict(self.config.items(section))
 
     def init_lcd(self):
-        """dynamically load and init lcd"""
         lcd_config = self.get_section(self.get("global.lcd"))
         path = lcd_config['provider']
         provider = getattr(import_module(path), "Provider")
@@ -49,26 +48,6 @@ class Config(object):
             provider = getattr(import_module(path), "Provider")
             p = provider(touch_config)
             p.provide(callback)
-
-    # def init_touch(self, callback):
-    #     """dynamically load and init touch panel"""
-    #     driver_name = self.config.get('touch', 'driver')
-    #     size = self.config.get('touch', 'size').split(",")
-    #     cs = self.config.get('touch', 'cs')
-    #     if cs == '':
-    #         cs = None
-    #     else:
-    #         cs = int(self.config.get('touch', 'cs'))
-    #     path = "gfxlcd.driver.{}.{}".format(driver_name, driver_name)
-    #     class_ = getattr(import_module(path), driver_name.upper())
-    #     driver = class_(
-    #         int(size[0]), int(size[1]),
-    #         int(self.config.get('touch', 'irq')),
-    #         callback,
-    #         cs
-    #     )
-    #     driver.rotate = int(self.config.get('touch', 'rotate'))
-    #     driver.init()
 
     def get_dict(self, name):
         value = self.get(name)
