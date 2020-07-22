@@ -20,7 +20,10 @@ class WindowManager(threading.Thread):
     def run(self):
         while self.work:
             for name in self.widgets:
-                print(name)
+                for panel in self.widgets[name]:
+                    if not panel.widget.initialized:
+                        panel.widget.draw_widget(self.lcd, panel.pos_x, panel.pos_y)
+                    panel.widget.draw_values(self.lcd, panel.pos_x, panel.pos_y)
 
 
     def stop(self):

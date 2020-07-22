@@ -22,9 +22,8 @@ class Clock(Widget):
         }
         self.initialized = False
 
-    def draw_widget(self, lcd, coords):
+    def draw_widget(self, lcd, pos_x, pos_y):
         """draw a tile"""
-        pos_x, pos_y = coords[0]
         lcd.background_color = self.colours['background']
         lcd.fill_rect(pos_x, pos_y, pos_x + 105, pos_y + 105)
 
@@ -34,27 +33,26 @@ class Clock(Widget):
 
         lcd.color = self.colours['border']
         lcd.draw_rect(pos_x, pos_y, pos_x + 105, pos_y + 105)
-        self.draw_values(lcd, coords, True)
+        self.draw_values(lcd, pos_x, pos_y, True)
         self.initialized = True
 
-    def draw_values(self, lcd, coords, force=False):
+    def draw_values(self, lcd, pos_x, pos_y, force=False):
         """draw values"""
-        pos_x, pos_y = coords[0]
         self.current = {
             'hour': datetime.datetime.now().strftime("%H"),
             'minute': datetime.datetime.now().strftime("%M"),
         }
         self.draw_number(
             lcd, pos_x+7, pos_y+15, self.font,
-            self.current['hour'], self.screen['hour'], 20,
+            self.current['hour'], self.on_screen['hour'], 20,
             force
         )
         self.draw_number(
             lcd, pos_x+57, pos_y+15, self.font,
-            self.current['minute'], self.screen['minute'], 20,
+            self.current['minute'], self.on_screen['minute'], 20,
             force
         )
-        self.screen = self.current.copy()
+        self.on_screen = self.current.copy()
 
     def update_values(self, values):
         pass

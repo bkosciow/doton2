@@ -9,12 +9,12 @@ class Widget(metaclass=abc.ABCMeta):
 
     """Widget abstract"""
     @abc.abstractmethod
-    def draw_widget(self, lcd, coords):
+    def draw_widget(self, lcd, pos_x, pos_y):
         """draw a tile"""
         pass
 
     @abc.abstractmethod
-    def draw_values(self, lcd, coords, force=False):
+    def draw_values(self, lcd, pos_x, pos_y, force=False):
         """draw a changed values. With force must redraw all values"""
         pass
 
@@ -34,6 +34,7 @@ class Widget(metaclass=abc.ABCMeta):
                     font.get(int(new[idx]))
                 )
 
+    # def draw(self):
 
 # class Clickable(metaclass=abc.ABCMeta):
 #     """Interface for clickable widget"""
