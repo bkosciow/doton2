@@ -34,8 +34,6 @@ class Widget(metaclass=abc.ABCMeta):
                     font.get(int(new[idx]))
                 )
 
-    # def draw(self):
-
 # class Clickable(metaclass=abc.ABCMeta):
 #     """Interface for clickable widget"""
 #     @abc.abstractmethod

@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import socket
-# from view.nodeone_widget import NodeOneWidget
+from widget.nodeone import NodeOne
 # from view.openweather_widget import OpenweatherWidget
 # from view.relay_widget import RelayWidget
 from widget.clock import Clock
@@ -26,14 +26,22 @@ FONTS = {
     '15x28_blue': numbers_15x28_blue.Numbers(),
 }
 
-# listener = Listener(config.get('grpc.address'))
-# listener.run()
+listener = Listener(config.get('grpc.address'))
+listener.start()
 
 window_manager = WindowManager(config.lcd)
 
 clock = Clock(FONTS['15x28'])
 window_manager.add_widget('clock', clock, 0, 0)
 
+kitchenNode = NodeOne(FONTS['24x42'])
+window_manager.add_widget('kitchen', kitchenNode, 110, 0)
+listener.add_widget('node-kitchen', kitchenNode)
+
+northNode = NodeOne(FONTS['24x42'])
+northNode.colours['background'] = (0, 100, 150)
+window_manager.add_widget('north', northNode, 220, 0)
+listener.add_widget('node-north', northNode)
 
 # config.init_touch(None)
 # broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -56,5 +64,8 @@ finally:
     # workerHandler.stop()
     window_manager.stop()
     window_manager.join()
+
+    listener.stop()
+    listener.join()
     # workerHandler.join()
     # svr.join()

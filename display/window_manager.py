@@ -25,7 +25,6 @@ class WindowManager(threading.Thread):
                         panel.widget.draw_widget(self.lcd, panel.pos_x, panel.pos_y)
                     panel.widget.draw_values(self.lcd, panel.pos_x, panel.pos_y)
 
-
     def stop(self):
         """stops a thread"""
         self.work = False
