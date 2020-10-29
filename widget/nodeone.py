@@ -17,19 +17,22 @@ class NodeOne(Widget):
             'temperature': 0,
             'humidity': 0,
             'movement': False,
-            'light': False
+            'light': False,
+            'power': False,
         }
         self.screen = {
             'temperature': None,
             'humidity': None,
             'movement': None,
-            'light': None
+            'light': None,
+            'power': None,
         }
         self.icon = {
-            'movement': Image.open('assets/image/movement.png'),
-            'light': Image.open('assets/image/lightbulb.png'),
-            'temperature': Image.open('assets/image/thermometer.png'),
-            'humidity': Image.open('assets/image/humidity.png')
+            'movement': Image.open('assets/image/nodeone/movement.png'),
+            'light': Image.open('assets/image/nodeone/lightbulb.png'),
+            'temperature': Image.open('assets/image/nodeone/thermometer.png'),
+            'humidity': Image.open('assets/image/nodeone/humidity.png'),
+            'power': Image.open('assets/image/nodeone/power.png')
         }
         self.initialized = False
 
@@ -60,7 +63,8 @@ class NodeOne(Widget):
             'temperature': str(self.current['temperature']).rjust(2, '0'),
             'humidity': str(self.current['humidity']).rjust(2, '0'),
             'movement': self.current['light'],
-            'light': self.current['movement']
+            'light': self.current['movement'],
+            'power': self.current['power'],
         }
         screen = {
             'temperature': None if self.screen['temperature'] is None
@@ -68,7 +72,8 @@ class NodeOne(Widget):
             'humidity': None if self.screen['humidity'] is None
             else str(self.screen['humidity']).rjust(2, '0'),
             'movement': self.screen['movement'],
-            'light': self.screen['light']
+            'light': self.screen['light'],
+            'power': self.screen['power'],
 
         }
         lcd.transparency_color = self.font.get_transparency()
@@ -102,6 +107,14 @@ class NodeOne(Widget):
                 lcd.background_color = self.colours['background']
                 lcd.fill_rect(pos_x+7, pos_y+30, pos_x+27, pos_y+50)
 
+        if force or self.current['power'] != self.screen['power']:
+            if self.current['power']:
+                lcd.transparency_color = (0, 0, 0)
+                lcd.draw_image(pos_x + 7, pos_y + 65, self.icon['power'])
+            else:
+                lcd.background_color = self.colours['background']
+                lcd.fill_rect(pos_x + 7, pos_y + 65, pos_x + 27, pos_y + 85)
+
         self.screen = self.current.copy()
 
     def update_values(self, values):
@@ -119,3 +132,6 @@ class NodeOne(Widget):
 
         if 'light' in values:
             self.current['light'] = values['light']
+
+        if 'relay' in values:
+            self.current['power'] = True if values['relay'][0] else False
