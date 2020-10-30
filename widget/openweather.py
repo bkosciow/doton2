@@ -1,6 +1,8 @@
 import copy
 from service.widget import Widget
 from PIL import Image
+from pprint import pprint
+from datetime import datetime, timedelta
 
 
 class Openweather(Widget):
@@ -296,15 +298,18 @@ class Openweather(Widget):
             return 'NNW'
 
     def update_values(self, values):
-        if not self.initialized:
-            return
+        # if not self.initialized:
+        #     return
         if 'current' in values:
             self.current_weather['current'] = values['current']
 
         if 'forecast' in values:
-            for day in values['forecast']:
-                if day in self.forecast_days:
-                    self.forecast_weather[day]['current'] = values['forecast'][day]
+            today = datetime.today()
+            for offset in self.forecast_days:
+                date = today + timedelta(days=offset)
+                date = date.strftime('%Y-%m-%d')
+                if date in values['forecast']:
+                    self.forecast_weather[offset]['current'] = values['forecast'][date]
 
     def _get_weather_icon(self, status):
         """load weather icon when needed"""

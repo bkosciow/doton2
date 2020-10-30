@@ -119,8 +119,8 @@ class NodeOne(Widget):
 
     def update_values(self, values):
         """change values"""
-        if not self.initialized:
-            return
+        # if not self.initialized:
+        #     return
         if 'temp' in values:
             self.current['temperature'] = values['temp']
 

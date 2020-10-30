@@ -27,7 +27,7 @@ FONTS = {
 }
 
 listener = Listener(config.get('grpc.address'))
-listener.start()
+
 
 window_manager = WindowManager(config.lcd)
 
@@ -43,16 +43,23 @@ northNode.colours['background'] = (0, 100, 150)
 window_manager.add_widget('north', northNode, 220, 0)
 listener.add_widget('node-north', northNode)
 
+livingNode = NodeOne(FONTS['24x42'])
+livingNode.colours['background'] = (100, 100, 150)
+window_manager.add_widget('living', livingNode, 330, 0)
+listener.add_widget('node-living', livingNode)
+
 openweatherNode = Openweather([1, 2], FONTS)
 window_manager.add_widget('openweather', openweatherNode, 0, 110)
+listener.add_widget('openweather', openweatherNode)
 
-
+listener.start()
 # config.init_touch(None)
 # broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 # address = (config.get('ip', '<broadcast>'), int(config.get('port')))
 #
 
+# exit(1)
 #
 window_manager.start()
 #

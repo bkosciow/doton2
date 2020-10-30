@@ -14,19 +14,28 @@ class Listener(Thread):
         self.widgets = {}
 
     def run(self):
+        self._initialize_values()
         for response in self.stub.get_changes(EmptyRequest()):
             try:
+                print(response.data)
                 response = json.loads(response.data)
                 key = list(response)[0]
                 self._dispatch_data(key, response[key])
             except ValueError as e:
                 response = None
 
-            if response:
-                pass
-
             if not self.work:
                 break
+
+    def _initialize_values(self):
+        for name in self.widgets:
+            message = Request(key=name)
+            response = self.stub.get_storage(message)
+            try:
+                response = json.loads(response.data)
+                self._dispatch_data(name, response)
+            except ValueError as e:
+                print("Failed to load {} data." % (name))
 
     def stop(self):
         self.work = False
@@ -38,7 +47,6 @@ class Listener(Thread):
         self.widgets[name].append(widget)
 
     def _dispatch_data(self, name, data):
-        print(name, ' <> ', data)
         if name in self.widgets:
             for widget in self.widgets[name]:
                 widget.update_values(data)
