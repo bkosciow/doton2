@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import socket
 from widget.nodeone import NodeOne
-# from view.openweather_widget import OpenweatherWidget
+from widget.openweather import Openweather
 # from view.relay_widget import RelayWidget
 from widget.clock import Clock
 from gfxlcd_fonts import numbers_24x42
@@ -42,6 +42,10 @@ northNode = NodeOne(FONTS['24x42'])
 northNode.colours['background'] = (0, 100, 150)
 window_manager.add_widget('north', northNode, 220, 0)
 listener.add_widget('node-north', northNode)
+
+openweatherNode = Openweather([1, 2], FONTS)
+window_manager.add_widget('openweather', openweatherNode, 0, 110)
+
 
 # config.init_touch(None)
 # broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
