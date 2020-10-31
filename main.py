@@ -48,7 +48,7 @@ livingNode.colours['background'] = (100, 100, 150)
 window_manager.add_widget('living', livingNode, 330, 0)
 listener.add_widget('node-living', livingNode)
 
-openweatherNode = Openweather([1, 2], FONTS)
+openweatherNode = Openweather([0, 1, 2], FONTS)
 window_manager.add_widget('openweather', openweatherNode, 0, 110)
 listener.add_widget('openweather', openweatherNode)
 

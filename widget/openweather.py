@@ -72,8 +72,8 @@ class Openweather(Widget):
     def draw_widget(self, lcd, pos_x, pos_y):
         """draw a tiles"""
         self._draw_widget(lcd, 'current', pos_x, pos_y)
-        for idx in self.forecast_days:
-            self._draw_widget(lcd, 'forecast', pos_x + (idx*110), pos_y)
+        for idx in range(len(self.forecast_days)):
+            self._draw_widget(lcd, 'forecast', pos_x + ((idx+1)*110), pos_y)
         self.draw_values(lcd, pos_x, pos_y, True)
         self.initialized = True
 
@@ -90,8 +90,9 @@ class Openweather(Widget):
     def draw_values(self, lcd, pos_x, pos_y, force=False):
         """draw values"""
         self._draw_values(lcd, 'current', 0, pos_x, pos_y, force)
-        for idx in self.forecast_days:
-            self._draw_values(lcd, 'forecast', idx, pos_x + (idx*110), pos_y, force)
+        # for idx in self.forecast_days:
+        for idx in range(len(self.forecast_days)):
+            self._draw_values(lcd, 'forecast', idx, pos_x + ((idx+1)*110), pos_y, force)
 
     def _draw_values(self, lcd, widget_type, day, pos_x, pos_y, force=False):
         """draw current values"""
