@@ -62,8 +62,8 @@ class NodeOne(Widget):
         current = {
             'temperature': str(self.current['temperature']).rjust(2, '0'),
             'humidity': str(self.current['humidity']).rjust(2, '0'),
-            'movement': self.current['light'],
-            'light': self.current['movement'],
+            'movement': self.current['movement'],
+            'light': self.current['light'],
             'power': self.current['power'],
         }
         screen = {
@@ -91,31 +91,31 @@ class NodeOne(Widget):
                 force
             )
 
-        if force or self.current['light'] != self.screen['light']:
-            if self.current['light']:
+        if force or current['light'] != screen['light']:
+            if current['light']:
                 lcd.transparency_color = (0, 0, 0)
                 lcd.draw_image(pos_x + 7, pos_y + 5, self.icon['light'])
             else:
                 lcd.background_color = self.colours['background']
                 lcd.fill_rect(pos_x+7, pos_y+5, pos_x+27, pos_y+25)
 
-        if force or self.current['movement'] != self.screen['movement']:
-            if self.current['movement']:
+        if force or current['movement'] != screen['movement']:
+            if current['movement']:
                 lcd.transparency_color = (0, 0, 0)
                 lcd.draw_image(pos_x + 7, pos_y + 30, self.icon['movement'])
             else:
                 lcd.background_color = self.colours['background']
                 lcd.fill_rect(pos_x+7, pos_y+30, pos_x+27, pos_y+50)
 
-        if force or self.current['power'] != self.screen['power']:
-            if self.current['power']:
+        if force or current['power'] != screen['power']:
+            if current['power']:
                 lcd.transparency_color = (0, 0, 0)
                 lcd.draw_image(pos_x + 7, pos_y + 65, self.icon['power'])
             else:
                 lcd.background_color = self.colours['background']
                 lcd.fill_rect(pos_x + 7, pos_y + 65, pos_x + 27, pos_y + 85)
 
-        self.screen = self.current.copy()
+        self.screen = current.copy()
 
     def update_values(self, values):
         """change values"""

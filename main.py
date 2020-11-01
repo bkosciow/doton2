@@ -3,6 +3,7 @@ import time
 import socket
 from widget.nodeone import NodeOne
 from widget.openweather import Openweather
+from widget.openaq import OpenAQ
 # from view.relay_widget import RelayWidget
 from widget.clock import Clock
 from gfxlcd_fonts import numbers_24x42
@@ -27,8 +28,6 @@ FONTS = {
 }
 
 listener = Listener(config.get('grpc.address'))
-
-
 window_manager = WindowManager(config.lcd)
 
 clock = Clock(FONTS['15x28'])
@@ -49,10 +48,18 @@ window_manager.add_widget('living', livingNode, 330, 0)
 listener.add_widget('node-living', livingNode)
 
 openweatherNode = Openweather([0, 1, 2], FONTS)
-window_manager.add_widget('openweather', openweatherNode, 0, 110)
+window_manager.add_widget('openweather', openweatherNode, 0, 107)
 listener.add_widget('openweather', openweatherNode)
 
+# 'Bielsko-Biała, ul. Kossak-Szczuckiej 19'
+# 'Bielsko-Biała, ul.Partyzantów'
+
+openAqNode = OpenAQ() #['Bielsko-Biała, ul.Partyzantów'])
+window_manager.add_widget('openaq', openAqNode, 0, 50)
+listener.add_widget('openaq', openAqNode)
+
 listener.start()
+
 # config.init_touch(None)
 # broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

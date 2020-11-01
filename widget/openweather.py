@@ -90,7 +90,6 @@ class Openweather(Widget):
     def draw_values(self, lcd, pos_x, pos_y, force=False):
         """draw values"""
         self._draw_values(lcd, 'current', 0, pos_x, pos_y, force)
-        # for idx in self.forecast_days:
         for idx in range(len(self.forecast_days)):
             self._draw_values(lcd, 'forecast', idx, pos_x + ((idx+1)*110), pos_y, force)
 

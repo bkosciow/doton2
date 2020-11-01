@@ -25,14 +25,14 @@ class Clock(Widget):
     def draw_widget(self, lcd, pos_x, pos_y):
         """draw a tile"""
         lcd.background_color = self.colours['background']
-        lcd.fill_rect(pos_x, pos_y, pos_x + 105, pos_y + 105)
+        lcd.fill_rect(pos_x, pos_y, pos_x + 105, pos_y + 45)
 
         lcd.color = self.colours['border']
-        lcd.draw_circle(pos_x+49, pos_y+25, 2)
-        lcd.draw_circle(pos_x+49, pos_y+35, 2)
+        lcd.draw_circle(pos_x+49, pos_y+18, 2)
+        lcd.draw_circle(pos_x+49, pos_y+28, 2)
 
         lcd.color = self.colours['border']
-        lcd.draw_rect(pos_x, pos_y, pos_x + 105, pos_y + 105)
+        lcd.draw_rect(pos_x, pos_y, pos_x + 105, pos_y + 45)
         self.draw_values(lcd, pos_x, pos_y, True)
         self.initialized = True
 
@@ -43,12 +43,12 @@ class Clock(Widget):
             'minute': datetime.datetime.now().strftime("%M"),
         }
         self.draw_number(
-            lcd, pos_x+7, pos_y+15, self.font,
+            lcd, pos_x+7, pos_y+8, self.font,
             self.current['hour'], self.on_screen['hour'], 20,
             force
         )
         self.draw_number(
-            lcd, pos_x+57, pos_y+15, self.font,
+            lcd, pos_x+57, pos_y+8, self.font,
             self.current['minute'], self.on_screen['minute'], 20,
             force
         )
