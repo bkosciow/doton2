@@ -10,12 +10,10 @@ from gfxlcd_fonts import numbers_24x42
 from gfxlcd_fonts import numbers_15x28
 from gfxlcd_fonts import numbers_15x28_red
 from gfxlcd_fonts import numbers_15x28_blue
-# from message_listener.server import Server
-# from iot_message.message import Message
-# from service.handler_dispatcher import HandlerDispatcher
 from display.window_manager import WindowManager
 from service.config import Config
 from connector.listener import Listener
+import service.comm as comm
 
 GPIO.setmode(GPIO.BCM)
 
@@ -26,25 +24,26 @@ FONTS = {
     '15x28_red': numbers_15x28_red.Numbers(),
     '15x28_blue': numbers_15x28_blue.Numbers(),
 }
+comm.address = (config.get("message.ip"), int(config.get("message.port")))
 
 listener = Listener(config.get('grpc.address'))
-window_manager = WindowManager(config.lcd)
+window_manager = WindowManager(config.lcd, config.init_touch)
 
 clock = Clock(FONTS['15x28'])
 window_manager.add_widget('clock', clock, 0, 0)
 
 kitchenNode = NodeOne(FONTS['24x42'])
-window_manager.add_widget('kitchen', kitchenNode, 110, 0)
+window_manager.add_widget('node-kitchen', kitchenNode, 110, 0)
 listener.add_widget('node-kitchen', kitchenNode)
 
 northNode = NodeOne(FONTS['24x42'])
 northNode.colours['background'] = (0, 100, 150)
-window_manager.add_widget('north', northNode, 220, 0)
+window_manager.add_widget('node-north', northNode, 220, 0)
 listener.add_widget('node-north', northNode)
 
 livingNode = NodeOne(FONTS['24x42'])
 livingNode.colours['background'] = (100, 100, 150)
-window_manager.add_widget('living', livingNode, 330, 0)
+window_manager.add_widget('node-living', livingNode, 330, 0)
 listener.add_widget('node-living', livingNode)
 
 openweatherNode = Openweather([0, 1, 2], FONTS)

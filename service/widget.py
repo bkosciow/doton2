@@ -6,6 +6,8 @@ class Widget(metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.encoder_idx = 0
+        self.width = 0
+        self.height = 0
 
     """Widget abstract"""
     @abc.abstractmethod
@@ -34,9 +36,10 @@ class Widget(metaclass=abc.ABCMeta):
                     font.get(int(new[idx]))
                 )
 
-# class Clickable(metaclass=abc.ABCMeta):
-#     """Interface for clickable widget"""
-#     @abc.abstractmethod
-#     def action(self, name, index, pos_x, pos_y):
-#         """action for touch"""
-#         return
+
+class Clickable(metaclass=abc.ABCMeta):
+    """Interface for clickable widget"""
+    @abc.abstractmethod
+    def action(self, name, pos_x, pos_y):
+        """action for touch"""
+        return

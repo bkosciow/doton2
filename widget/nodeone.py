@@ -1,9 +1,10 @@
 """Widget for Node One sensor. Displas data from it in form of tile"""
-from service.widget import Widget
+from service.widget import Widget, Clickable
 from PIL import Image
+import service.comm as comm
 
 
-class NodeOne(Widget):
+class NodeOne(Widget, Clickable):
     """Class NodeOne"""
     def __init__(self, font):
         super().__init__()
@@ -34,6 +35,8 @@ class NodeOne(Widget):
             'humidity': Image.open('assets/image/nodeone/humidity.png'),
             'power': Image.open('assets/image/nodeone/power.png')
         }
+        self.width = 105
+        self.height = 105
         self.initialized = False
 
     def draw_widget(self, lcd, pos_x, pos_y):
@@ -135,3 +138,15 @@ class NodeOne(Widget):
 
         if 'relay' in values:
             self.current['power'] = True if values['relay'][0] else False
+
+    def action(self, name, pos_x, pos_y):
+        if 0 < pos_x < 50 and 51 < pos_y < self.height:
+            message = {
+                'parameters': {
+                    'channel': 0
+                },
+                'targets': [name],
+                'event': "channel.off" if self.current['power'] else "channel.on"
+            }
+
+            comm.send(message)

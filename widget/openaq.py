@@ -92,7 +92,7 @@ class OpenAQ(Widget):
         if current['NO2'] is not None and (force or current['NO2'] != self.screen['NO2']):
             lcd.draw_image(pos_x + 72, pos_y + 20, self.icon['no2_' + str(current['NO2'])])
 
-        if current['highest_index'] != self.screen['highest_index']:
+        if force or current['highest_index'] != self.screen['highest_index']:
             lcd.color = self.colours[current['highest_index']]
             lcd.draw_rect(pos_x, pos_y, pos_x + 105, pos_y + 35)
             lcd.draw_rect(pos_x + 1, pos_y + 1, pos_x + 104, pos_y + 34)
