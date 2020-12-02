@@ -47,7 +47,7 @@ class Listener(Thread):
         self.widgets[name].append(widget)
 
     def _dispatch_data(self, name, data):
-        print(name, "<>", data)
+        # print(name, "<>", data)
         if name in self.widgets:
             for widget in self.widgets[name]:
                 widget.update_values(data)

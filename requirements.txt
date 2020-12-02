@@ -5,3 +5,4 @@ gfxlcd==0.8.3
 spidev==3.4
 iot_message==1.2.1
 pycryptodome=3.9.9
+gfxlcd_fonts==0.2

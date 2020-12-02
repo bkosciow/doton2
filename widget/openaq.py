@@ -108,7 +108,7 @@ class OpenAQ(Widget):
                     if data[item] is not None:
                         if item in self.current and (self.current[item] is None or self.current[item] < data[item]['index']):
                             self.current[item] = data[item]['index']
-                        if highest_index < data[item]['index']:
+                        if item in self.current and highest_index < data[item]['index']:
                             highest_index = data[item]['index']
 
         self.current['highest_index'] = highest_index
