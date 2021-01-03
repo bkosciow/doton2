@@ -6,10 +6,14 @@ import math
 
 
 class Printer3d(Widget):
-    def __init__(self, font):
+
+    def __init__(self, font, light_pin=None, power_pin=None, reverse_relay=True):
         super().__init__()
         self.font = font
         self.work = True
+        self.light_pin = light_pin
+        self.power_pin = power_pin
+        self.reverse_relay = reverse_relay
         self.current = {
             'status': None,
             'percentage': None,
@@ -19,6 +23,8 @@ class Printer3d(Widget):
             'layers': None,
             'currentLayer': None,
             'tsTimeLeft': None,
+            'light': None,
+            'power': None,
         }
         self.on_screen = {
             'status': None,
@@ -29,6 +35,8 @@ class Printer3d(Widget):
             'layers': None,
             'currentLayer': None,
             'tsTimeLeft': None,
+            'light': None,
+            'power': None,
         }
         self.colours = {
             'background': (100, 100, 150),
@@ -41,6 +49,9 @@ class Printer3d(Widget):
             'status_aborted': Image.open('assets/image/printer3d/abort.png'),
             'status_printed': Image.open('assets/image/printer3d/done.png'),
             'status_printing': Image.open('assets/image/printer3d/start.png'),
+            'light_on': Image.open('assets/image/printer3d/lightbulb.png'),
+            'power_on': Image.open('assets/image/printer3d/power_on.png'),
+            'power_off': Image.open('assets/image/printer3d/power_off.png'),
         }
         self.width = 105
         self.height = 105
@@ -83,7 +94,9 @@ class Printer3d(Widget):
             'timeLeft': self.current['timeLeft'],
             'tsTimeLeft': self.current['tsTimeLeft'],
             'currentLayer': self.current['currentLayer'],
-            'layers': self.current['layers']
+            'layers': self.current['layers'],
+            'light': self.current['light'],
+            'power': self.current['power'],
         }
 
         if force or self.on_screen['percentage'] != current['percentage']:
@@ -116,6 +129,22 @@ class Printer3d(Widget):
                     lcd, pos_x + 75, pos_y + 32, self.font, current['timeLeft'][2], self.on_screen['timeLeft'][2] if self.on_screen['timeLeft'] is not None else None, 15, force
                 )
 
+        if current['light'] is not None and (force or self.on_screen['light'] != current['light']):
+            if current['light']:
+                lcd.transparency_color = (0, 0, 0)
+                lcd.draw_image(pos_x+7, pos_y+70, self.icon['light_on'])
+            else:
+                lcd.color = self.colours['border']
+                lcd.fill_rect(pos_x + 7, pos_y + 70, pos_x + 30, pos_y + 100)
+
+        if current['power'] is not None and (force or self.on_screen['power'] != current['power']):
+            if current['power']:
+                lcd.transparency_color = (255, 255, 255)
+                lcd.draw_image(pos_x + 70, pos_y + 70, self.icon['power_on'])
+            else:
+                lcd.transparency_color = (255, 255, 255)
+                lcd.draw_image(pos_x + 70, pos_y + 70, self.icon['power_off'])
+
         self.on_screen = current.copy()
 
     def _times_differ(self, time_one, time_two):
@@ -131,6 +160,7 @@ class Printer3d(Widget):
         return False
 
     def update_values(self, values):
+        print(values)
         if 'status' in values:
             self.current['status'] = values['status']
         if 'percentage' in values:
@@ -146,6 +176,17 @@ class Printer3d(Widget):
             self.current['currentLayer'] = values["currentLayer"]
         if 'totalLayers' in values:
             self.current['layers'] = values["totalLayers"]
+        if 'relay' in values:
+            if self.power_pin is not None:
+                self.current['power'] = bool(values['relay'][self.power_pin])
+                if self.reverse_relay:
+                    self.current['power'] = not self.current['power']
+            if self.light_pin is not None:
+                self.current['light'] = bool(values['relay'][self.light_pin])
+                if self.reverse_relay:
+                    self.current['light'] = not  self.current['light']
+
+        print(self.current)
 
 
 def _decrease_time(time, seconds):

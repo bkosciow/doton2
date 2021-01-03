@@ -71,7 +71,7 @@ Dummy3dNode = Printer3d(FONTS['12x25'])
 window_manager.add_widget('DummyPrinter', Dummy3dNode, 110, 200)
 listener.add_widget('DummyPrinter', Dummy3dNode)
 
-ender5proNode = Printer3d(FONTS['12x25'])
+ender5proNode = Printer3d(FONTS['12x25'], 1, 0)
 window_manager.add_widget('node-ender5pro', ender5proNode, 220, 200)
 listener.add_widget('node-ender5pro', ender5proNode)
 
