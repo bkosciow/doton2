@@ -1,11 +1,12 @@
-from service.widget import Widget
+from service.widget import Widget, Clickable
 from PIL import Image
 import re
 import datetime
 import math
+import service.comm as comm
 
 
-class Printer3d(Widget):
+class Printer3d(Widget, Clickable):
 
     def __init__(self, font, light_pin=None, power_pin=None, reverse_relay=True):
         super().__init__()
@@ -14,6 +15,7 @@ class Printer3d(Widget):
         self.light_pin = light_pin
         self.power_pin = power_pin
         self.reverse_relay = reverse_relay
+        self.reverse_commands = False
         self.current = {
             'status': None,
             'percentage': None,
@@ -112,7 +114,7 @@ class Printer3d(Widget):
             )
 
         if (force or self.on_screen['status'] != current['status']) and current['status'] is not None:
-            lcd.color = self.colours['border']
+            lcd.background_color = self.colours['background']
             lcd.fill_rect(pos_x + 7, pos_y + 5, pos_x + 30, pos_y + 25)
             lcd.transparency_color = (255, 255, 255)
             lcd.draw_image(pos_x + 7, pos_y + 5, self.icon['status_'+current['status']])
@@ -134,10 +136,12 @@ class Printer3d(Widget):
                 lcd.transparency_color = (0, 0, 0)
                 lcd.draw_image(pos_x+7, pos_y+70, self.icon['light_on'])
             else:
-                lcd.color = self.colours['border']
+                lcd.background_color = self.colours['background']
                 lcd.fill_rect(pos_x + 7, pos_y + 70, pos_x + 30, pos_y + 100)
 
         if current['power'] is not None and (force or self.on_screen['power'] != current['power']):
+            lcd.color = self.colours['background']
+            lcd.fill_rect(pos_x+70, pos_y+70, pos_x+94, pos_y+96)
             if current['power']:
                 lcd.transparency_color = (255, 255, 255)
                 lcd.draw_image(pos_x + 70, pos_y + 70, self.icon['power_on'])
@@ -160,7 +164,6 @@ class Printer3d(Widget):
         return False
 
     def update_values(self, values):
-        print(values)
         if 'status' in values:
             self.current['status'] = values['status']
         if 'percentage' in values:
@@ -186,7 +189,23 @@ class Printer3d(Widget):
                 if self.reverse_relay:
                     self.current['light'] = not  self.current['light']
 
-        print(self.current)
+    def action(self, name, pos_x, pos_y):
+        if not self.light_pin:
+            return
+
+        if 0 < pos_x < 70 and 41 < pos_y < self.height:
+            current_light = self.current['light']
+            if self.reverse_commands:
+                current_light = not current_light
+            message = {
+                'parameters': {
+                    'channel': self.light_pin
+                },
+                'targets': [name],
+                'event': "channel.off" if current_light else "channel.on"
+            }
+
+            comm.send(message)
 
 
 def _decrease_time(time, seconds):
@@ -228,3 +247,4 @@ def _explode_time_left(time_left):
         raise e
 
     return [days, hours, minutes, seconds]
+
