@@ -34,45 +34,47 @@ comm.address = (config.get("message.ip"), int(config.get("message.port")))
 listener = Listener(config.get('grpc.address'))
 window_manager = WindowManager(config.lcd, config.init_touch)
 
-# clock = Clock(FONTS['15x28'])
-# window_manager.add_widget('clock', clock, 0, 0)
+clock = Clock(FONTS['15x28'])
+window_manager.add_widget('clock', clock, 0, 0)
 
-# kitchenNode = NodeOne(FONTS['24x42'])
-# window_manager.add_widget('node-kitchen', kitchenNode, 110, 0)
-# listener.add_widget('node-kitchen', kitchenNode)
-#
-# northNode = NodeOne(FONTS['24x42'])
-# northNode.colours['background'] = (0, 100, 150)
-# window_manager.add_widget('node-north', northNode, 220, 0)
-# listener.add_widget('node-north', northNode)
-#
-# livingNode = NodeOne(FONTS['24x42'])
-# livingNode.colours['background'] = (100, 100, 150)
-# window_manager.add_widget('node-living', livingNode, 330, 0)
-# listener.add_widget('node-living', livingNode)
-#
-# openweatherNode = Openweather([0, 1, 2], FONTS)
-# window_manager.add_widget('openweather', openweatherNode, 0, 107)
-# listener.add_widget('openweather', openweatherNode)
+kitchenNode = NodeOne(FONTS['24x42'])
+window_manager.add_widget('node-kitchen', kitchenNode, 110, 0)
+listener.add_widget('node-kitchen', kitchenNode)
 
-# 'Bielsko-Biała, ul. Kossak-Szczuckiej 19'
-# 'Bielsko-Biała, ul.Partyzantów'
+northNode = NodeOne(FONTS['24x42'])
+northNode.colours['background'] = (0, 100, 150)
+window_manager.add_widget('node-north', northNode, 220, 0)
+listener.add_widget('node-north', northNode)
 
-# openAqNode = OpenAQ() #['Bielsko-Biała, ul.Partyzantów'])
-# window_manager.add_widget('openaq', openAqNode, 0, 50)
-# listener.add_widget('openaq', openAqNode)
+livingNode = NodeOne(FONTS['24x42'])
+livingNode.colours['background'] = (100, 100, 150)
+window_manager.add_widget('node-living', livingNode, 330, 0)
+listener.add_widget('node-living', livingNode)
+
+openweatherNode = Openweather([0, 1, 2], FONTS)
+window_manager.add_widget('openweather', openweatherNode, 0, 107)
+listener.add_widget('openweather', openweatherNode)
+
+'Bielsko-Biała, ul. Kossak-Szczuckiej 19'
+'Bielsko-Biała, ul.Partyzantów'
+
+openAqNode = OpenAQ() #['Bielsko-Biała, ul.Partyzantów'])
+window_manager.add_widget('openaq', openAqNode, 0, 50)
+listener.add_widget('openaq', openAqNode)
 
 cr6Node = Printer3d(FONTS['12x25'])
-window_manager.add_widget('node-ce6cr', cr6Node, 0, 200)
+cr6Node.colours['border'] = (0, 0, 255)
+window_manager.add_widget('node-ce6cr', cr6Node, 110, 214)
 listener.add_widget('node-ce6cr', cr6Node)
 
+# Dummy3dNode = Printer3d(FONTS['12x25'])
+# window_manager.add_widget('DummyPrinter', Dummy3dNode, 110, 200)
+# listener.add_widget('DummyPrinter', Dummy3dNode)
 
-Dummy3dNode = Printer3d(FONTS['12x25'])
-window_manager.add_widget('DummyPrinter', Dummy3dNode, 110, 200)
-listener.add_widget('DummyPrinter', Dummy3dNode)
-
-ender5proNode = Printer3d(FONTS['12x25'])
-window_manager.add_widget('node-ender5pro', ender5proNode, 220, 200)
+ender5proNode = Printer3d(FONTS['12x25'], 1, 0)
+ender5proNode.reverse_commands = True
+ender5proNode.colours['border'] = (255, 165, 0)
+window_manager.add_widget('node-ender5pro', ender5proNode, 0, 214)
 listener.add_widget('node-ender5pro', ender5proNode)
 
 listener.start()

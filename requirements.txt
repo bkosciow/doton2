@@ -1,8 +1,8 @@
 RPi.GPIO==0.7.0
-pillow==8.0.1
+pillow>=8.1.1
 gfxcili==0.2
 gfxlcd==0.8.3
 spidev==3.4
 iot_message==1.2.1
-pycryptodome=3.9.9
+pycryptodome==3.9.9
 gfxlcd_fonts==0.2
