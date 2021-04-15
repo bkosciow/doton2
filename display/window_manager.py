@@ -1,18 +1,24 @@
 import threading
 from .panel import Panel
 from service.widget import Clickable
+from PIL import Image
+import time
 
 
 class WindowManager(threading.Thread):
 
     def __init__(self, lcd, touch=None):
         threading.Thread.__init__(self)
+        self.images = {
+            "connection_lost": Image.open('assets/image/conn_lost.png')
+        }
         self.work = True
         self.lcd = lcd
         self.widgets = {}
         self.force_draw = True
         self.point = None
         self.touch = touch(self.click)
+        # self.lcd_used = False
 
     def add_widget(self, name, widget, pos_x, pos_y):
         if name not in self.widgets:
@@ -52,3 +58,9 @@ class WindowManager(threading.Thread):
                         panel.pos_y < point[1] < panel.pos_y + panel.widget.height:
                     panel.widget.action(widgets, point[0] - panel.pos_x, point[1] - panel.pos_y)
 
+    def crash(self):
+        self.stop()
+        self.widgets = {}
+        time.sleep(5)
+        self.lcd.transparency_color = (0, 0, 0)
+        self.lcd.draw_image(90, 100, self.images['connection_lost'])
