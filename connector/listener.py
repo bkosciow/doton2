@@ -12,30 +12,37 @@ class Listener(Thread):
         self.stub = ProviderStub(self.channel)
         self.work = True
         self.widgets = {}
+        self.connection_error = False
 
     def run(self):
-        self._initialize_values()
-        for response in self.stub.get_changes(EmptyRequest()):
-            try:
-                response = json.loads(response.data)
-                key = list(response)[0]
-                self._dispatch_data(key, response[key])
-            except ValueError as e:
-                response = None
+        try:
+            self._initialize_values()
+            for response in self.stub.get_changes(EmptyRequest()):
+                try:
+                    response = json.loads(response.data)
+                    key = list(response)[0]
+                    self._dispatch_data(key, response[key])
+                except ValueError as e:
+                    response = None
 
-            if not self.work:
-                break
+                if not self.work:
+                    break
+        except grpc.RpcError as e:
+            print("grpc crash")
+            self.work = False
+            self.connection_error = True
 
     def _initialize_values(self):
         for name in self.widgets:
-            message = Request(key=name)
-            response = self.stub.get_storage(message)
             try:
+                message = Request(key=name)
+                response = self.stub.get_storage(message)
                 response = json.loads(response.data)
                 if response:
                     self._dispatch_data(name, response)
             except ValueError as e:
                 print("Failed to load {} data." % (name))
+
 
     def stop(self):
         self.work = False

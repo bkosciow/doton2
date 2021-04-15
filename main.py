@@ -16,6 +16,8 @@ from display.window_manager import WindowManager
 from service.config import Config
 from connector.listener import Listener
 import service.comm as comm
+from service.exceptions import *
+
 
 GPIO.setmode(GPIO.BCM)
 
@@ -77,32 +79,22 @@ ender5proNode.colours['border'] = (255, 165, 0)
 window_manager.add_widget('node-ender5pro', ender5proNode, 0, 214)
 listener.add_widget('node-ender5pro', ender5proNode)
 
-listener.start()
-
-# config.init_touch(None)
-# broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-# address = (config.get('ip', '<broadcast>'), int(config.get('port')))
-#
-
-# exit(1)
-#
-window_manager.start()
-#
 try:
+    listener.start()
+    window_manager.start()
+
     while True:
         time.sleep(1)
+        if listener.connection_error:
+            window_manager.crash()
+            raise ConnectionLost()
 except KeyboardInterrupt:
     print("closing...")
 except:
     raise
 finally:
-    pass
-    # workerHandler.stop()
     window_manager.stop()
     window_manager.join()
 
     listener.stop()
     listener.join()
-    # workerHandler.join()
-    # svr.join()
