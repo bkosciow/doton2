@@ -44,7 +44,7 @@ class OpenAQ(Widget):
             'index_5': Image.open('assets/image/airquality/index_5.png'),
         }
 
-        for i in range(0, 5):
+        for i in range(0, 6):
             for item in [['pm25', 0, 36], ['pm10', 39, 74], ['o3', 76, 93], ['so2', 96, 121], ['co', 124, 142], ['no2', 145, 170]]:
                 self.icon[item[0] + "_" + str(i)] = self.icon['index_' + str(i)].crop((item[1], 0, item[2], 13))
 
