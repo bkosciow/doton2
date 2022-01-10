@@ -229,7 +229,7 @@ def _decrease_time(time, seconds):
     return out
 
 
-def _explode_time_left(time_left):
+def _explode_time_left_regexp(time_left):
     if time_left is None or time_left == "0" or time_left == "-":
         return ["00", "00", "00"]
     try:
@@ -248,3 +248,27 @@ def _explode_time_left(time_left):
 
     return [days, hours, minutes, seconds]
 
+
+def _explode_time_left(time_left):
+    if time_left is None or time_left == "0" or time_left == "-":
+        return ["00", "00", "00"]
+    days = "0"
+    hours = "0"
+    minutes = "0"
+    seconds = "0"
+    value = ""
+    for letter in time_left:
+        if letter.isdigit():
+            value += letter
+        else:
+            if letter == "h":
+                hours = value
+            if letter == "m":
+                minutes = value
+            if letter == "s":
+                seconds = value
+            if letter == "d":
+                days = value
+            value = ""
+
+    return [days.rjust(2, '0'), hours.rjust(2, '0'), minutes.rjust(2, '0'), seconds.rjust(2, '0')]

@@ -3,6 +3,8 @@ from service.widget import Widget
 from PIL import Image
 from pprint import pprint
 from datetime import datetime, timedelta
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Openweather(Widget):
@@ -298,18 +300,28 @@ class Openweather(Widget):
             return 'NNW'
 
     def update_values(self, values):
-        # if not self.initialized:
-        #     return
-        if 'current' in values:
-            self.current_weather['current'] = values['current']
+        try:
+            if values is None:
+                logger.error('weather null')
+                print("Weather null value")
+                return
+            if 'current' in values and values['current'] is not None:
+                logger.debug('current weather')
+                self.current_weather['current'] = values['current']
 
-        if 'forecast' in values:
-            today = datetime.today()
-            for offset in self.forecast_days:
-                date = today + timedelta(days=offset)
-                date = date.strftime('%Y-%m-%d')
-                if date in values['forecast']:
-                    self.forecast_weather[offset]['current'] = values['forecast'][date]
+            if 'forecast' in values and values['forecast'] is not None:
+                logger.debug('forecast weather')
+                today = datetime.today()
+                for offset in self.forecast_days:
+                    date = today + timedelta(days=offset)
+                    date = date.strftime('%Y-%m-%d')
+                    if date in values['forecast']:
+                        self.forecast_weather[offset]['current'] = values['forecast'][date]
+        except:
+            # print(values)
+            logger.error('exception')
+            logger.exception('values errror')
+            raise
 
     def _get_weather_icon(self, status):
         """load weather icon when needed"""

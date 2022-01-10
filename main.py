@@ -17,7 +17,14 @@ from service.config import Config
 from connector.listener import Listener
 import service.comm as comm
 from service.exceptions import *
+import logging
 
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(module)s - %(message)s',
+    filename='doton.log',
+    level=logging.DEBUG
+)
+logging.debug('Starting')
 
 GPIO.setmode(GPIO.BCM)
 
@@ -89,7 +96,7 @@ try:
             window_manager.crash()
             raise ConnectionLost()
 except KeyboardInterrupt:
-    print("closing...")
+    logging.debug('Closing')
 except:
     raise
 finally:
