@@ -1,5 +1,7 @@
 from service.widget import Widget
 from PIL import Image
+import logging
+logger = logging.getLogger(__name__)
 
 
 class OpenAQ(Widget):
@@ -92,7 +94,7 @@ class OpenAQ(Widget):
         if current['NO2'] is not None and (force or current['NO2'] != self.screen['NO2']):
             lcd.draw_image(pos_x + 72, pos_y + 20, self.icon['no2_' + str(current['NO2'])])
 
-        if force or current['highest_index'] != self.screen['highest_index']:
+        if (force or current['highest_index'] != self.screen['highest_index']) and current['highest_index'] is not None:
             lcd.color = self.colours[current['highest_index']]
             lcd.draw_rect(pos_x, pos_y, pos_x + 105, pos_y + 35)
             lcd.draw_rect(pos_x + 1, pos_y + 1, pos_x + 104, pos_y + 34)
@@ -101,14 +103,30 @@ class OpenAQ(Widget):
 
     def update_values(self, values):
         highest_index = 0
+        current = {
+            'PM25': None,
+            'PM10': None,
+            'O3': None,
+            'SO2': None,
+            'CO': None,
+            'NO2': None,
+        }
         for location in values:
             if self.group is None or location in self.group:
                 data = values[location]
-                for item in data:
-                    if data[item] is not None:
-                        if item in self.current and (self.current[item] is None or self.current[item] < data[item]['index']):
-                            self.current[item] = data[item]['index']
-                        if item in self.current and highest_index < data[item]['index']:
-                            highest_index = data[item]['index']
+                if isinstance(data, dict):
+                    for item in data:
+                        logger.debug('openaq data ')
+                        if data[item] is not None:
+                            if item in current and (
+                                    current[item] is None or current[item] < data[item]['index']):
+                                current[item] = data[item]['index']
+
+        for k, v in current.items():
+            if v is None:
+                v = 0
+            self.current[k] = v
+            if v > highest_index:
+                highest_index = v
 
         self.current['highest_index'] = highest_index
