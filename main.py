@@ -14,7 +14,8 @@ from gfxlcd_fonts import numbers_15x28_blue
 from gfxlcd_fonts import numbers_12x25
 from display.window_manager import WindowManager
 from service.config import Config
-from connector.listener import Listener
+# from connector.listener import Listener
+from socket_conn.listener import Listener
 import service.comm as comm
 from service.exceptions import *
 import logging
@@ -40,7 +41,8 @@ FONTS = {
 
 comm.address = (config.get("message.ip"), int(config.get("message.port")))
 
-listener = Listener(config.get('grpc.address'))
+# listener = Listener(config.get('grpc.address'))
+listener = Listener(config.get('socket.address'))
 window_manager = WindowManager(config.lcd, config.init_touch)
 
 clock = Clock(FONTS['15x28'])
