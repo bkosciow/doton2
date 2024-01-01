@@ -101,7 +101,7 @@ class OpenAQ(Widget):
 
         self.screen = current.copy()
 
-    def update_values(self, values):
+    def update_values(self, values, name=""):
         highest_index = 0
         current = {
             'PM25': None,

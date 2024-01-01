@@ -21,7 +21,7 @@ class Widget(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update_values(self, values):
+    def update_values(self, values, name=""):
         """change a value, values is a dict [name] = value"""
         pass
 

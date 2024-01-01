@@ -54,5 +54,5 @@ class Clock(Widget):
         )
         self.on_screen = self.current.copy()
 
-    def update_values(self, values):
+    def update_values(self, values, name=""):
         pass

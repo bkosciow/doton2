@@ -120,7 +120,7 @@ class NodeOne(Widget, Clickable):
 
         self.screen = current.copy()
 
-    def update_values(self, values):
+    def update_values(self, values, name=""):
         """change values"""
         # if not self.initialized:
         #     return

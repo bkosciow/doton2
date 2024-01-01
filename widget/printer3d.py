@@ -4,39 +4,40 @@ import re
 import datetime
 import math
 import service.comm as comm
+from datetime import datetime, timedelta
 
 
 class Printer3d(Widget, Clickable):
 
-    def __init__(self, font, light_pin=None, power_pin=None, reverse_relay=True):
+    def __init__(self, font,
+                 light_node_name=None, light_channel=0, light_reversed=False,
+                 power_node_name=None, power_channel=0, power_reversed=False):
         super().__init__()
         self.font = font
         self.work = True
-        self.light_pin = light_pin
-        self.power_pin = power_pin
-        self.reverse_relay = reverse_relay
-        self.reverse_commands = False
+        self.light = {
+            "node_name": light_node_name,
+            "channel": light_channel,
+            "reversed": light_reversed
+        }
+        self.power = {
+            "node_name": power_node_name,
+            "channel": power_channel,
+            "reversed": power_reversed
+        }
         self.current = {
             'status': None,
             'percentage': None,
-            'eta': None,
             'secondsLeft': None,
             'timeLeft': None,
-            'layers': None,
-            'currentLayer': None,
-            'tsTimeLeft': None,
             'light': None,
             'power': None,
         }
         self.on_screen = {
             'status': None,
             'percentage': None,
-            'eta': None,
             'secondsLeft': None,
             'timeLeft': None,
-            'layers': None,
-            'currentLayer': None,
-            'tsTimeLeft': None,
             'light': None,
             'power': None,
         }
@@ -66,8 +67,6 @@ class Printer3d(Widget, Clickable):
         lcd.transparency_color = (0, 0, 0)
 
         lcd.color = self.colours['border']
-        # lcd.draw_circle(pos_x + 36, pos_y + 40, 1)
-        # lcd.draw_circle(pos_x + 36, pos_y + 50, 1)
 
         lcd.draw_circle(pos_x + 71, pos_y + 40, 1)
         lcd.draw_circle(pos_x + 71, pos_y + 50, 1)
@@ -79,24 +78,10 @@ class Printer3d(Widget, Clickable):
         self.initialized = True
 
     def draw_values(self, lcd, pos_x, pos_y, force=False):
-        # modify timeLeft according to ts
-        if self.current['tsTimeLeft'] is not None \
-                and self.current['timeLeft'] is not None and self.current['timeLeft'] != "0":
-            now = datetime.datetime.now()
-            d = datetime.datetime.now() - self.current['tsTimeLeft']
-            if d.total_seconds() > 1:
-                self.current['tsTimeLeft'] = now
-                self.current['timeLeft'] = _decrease_time(self.current['timeLeft'], math.floor(d.total_seconds()))
-
         current = {
             'status': self.current['status'],
             'percentage': '00' if self.current['percentage'] is None else str(self.current['percentage']).rjust(2, '0'),
-            'eta': self.current['eta'],
-            'secondsLeft': self.current['secondsLeft'],
             'timeLeft': self.current['timeLeft'],
-            'tsTimeLeft': self.current['tsTimeLeft'],
-            'currentLayer': self.current['currentLayer'],
-            'layers': self.current['layers'],
             'light': self.current['light'],
             'power': self.current['power'],
         }
@@ -122,13 +107,10 @@ class Printer3d(Widget, Clickable):
         if force or self._times_differ(current['timeLeft'], self.on_screen['timeLeft']):
             if current['timeLeft'] is not None:
                 self.draw_number(
-                    lcd, pos_x + 5, pos_y + 32, self.font, current['timeLeft'][0], self.on_screen['timeLeft'][0] if self.on_screen['timeLeft'] is not None else None, 15, force
+                    lcd, pos_x + 24, pos_y + 32, self.font, current['timeLeft'][0], self.on_screen['timeLeft'][0] if self.on_screen['timeLeft'] is not None else None, 15, force
                 )
                 self.draw_number(
-                    lcd, pos_x + 40, pos_y + 32, self.font, current['timeLeft'][1], self.on_screen['timeLeft'][1] if self.on_screen['timeLeft'] is not None else None, 15, force
-                )
-                self.draw_number(
-                    lcd, pos_x + 75, pos_y + 32, self.font, current['timeLeft'][2], self.on_screen['timeLeft'][2] if self.on_screen['timeLeft'] is not None else None, 15, force
+                    lcd, pos_x + 75, pos_y + 32, self.font, current['timeLeft'][1], self.on_screen['timeLeft'][1] if self.on_screen['timeLeft'] is not None else None, 15, force
                 )
 
         if current['light'] is not None and (force or self.on_screen['light'] != current['light']):
@@ -158,117 +140,55 @@ class Printer3d(Widget, Clickable):
         if time_two is None and time_one is not None:
             return True
 
-        if time_one[0] != time_two[0] or time_one[1] != time_two[1] or time_one[2] != time_two[2]:
+        if time_one[0] != time_two[0] or time_one[1] != time_two[1]:
             return True
 
         return False
 
-    def update_values(self, values):
-        if 'status' in values:
-            self.current['status'] = values['status']
-        if 'percentage' in values:
-            self.current['percentage'] = values['percentage']
-        if 'eta' in values:
-            self.current['eta'] = values['eta']
-        if 'secondsLeft' in values:
-            self.current['secondsLeft'] = values['secondsLeft']
-        if 'printTimeLeft' in values:
-            self.current['timeLeft'] = _explode_time_left(values["printTimeLeft"])
-            self.current['tsTimeLeft'] = datetime.datetime.now()
-        if 'currentLayer' in values:
-            self.current['currentLayer'] = values["currentLayer"]
-        if 'totalLayers' in values:
-            self.current['layers'] = values["totalLayers"]
-        if 'relay' in values:
-            if self.power_pin is not None:
-                self.current['power'] = bool(values['relay'][self.power_pin])
-                if self.reverse_relay:
-                    self.current['power'] = not self.current['power']
-            if self.light_pin is not None:
-                self.current['light'] = bool(values['relay'][self.light_pin])
-                if self.reverse_relay:
-                    self.current['light'] = not  self.current['light']
+    def update_values(self, values, name=""):
+        if 'error' in values:
+            if values['error']:
+                if 'error_message' in values and values['error_message'] != '':
+                    self.current['status'] = "disconnected"
+                else:
+                    self.current['status'] = "disconnected"
+            else:
+                self.current['status'] = "connected"
+                if 'status' in values:
+                    if values['flags']['printing'] or values['flags']['pausing'] or values['flags']['paused']:
+                        self.current['status'] = "printing"
+                        self.current['percentage'] = round(values['print']['completion'])
+                        self.current['timeLeft'] = str(timedelta(seconds=values['print']['printTimeLeft'])).split(':')[:2]
+                        self.current['timeLeft'][0] = self.current['timeLeft'][0].rjust(3, '0')
+                        self.current['timeLeft'][1] = self.current['timeLeft'][1].rjust(2, '0')
+                        if float(values['print']['completion']) > 99.8:
+                            self.current['status'] = "printed"
+                    else:
+                        self.current['percentage'] = 0
+                        self.current['timeLeft'] = ['000', '00']
+
+        if self.light is not None and "relay" in values:
+            if name == self.light['node_name']:
+                self.current['light'] = bool(values['relay'][self.light['channel']])
+
+        if self.power is not None and "relay" in values:
+            if name == self.power['node_name']:
+                self.current['power'] = bool(values['relay'][self.power['channel']])
 
     def action(self, name, pos_x, pos_y):
-        if not self.light_pin:
+        if not self.light["node_name"]:
             return
 
-        if 0 < pos_x < 70 and 41 < pos_y < self.height:
+        if 0 < pos_x < self.width and 41 < pos_y < self.height:
             current_light = self.current['light']
-            if self.reverse_commands:
+            if self.light["reversed"]:
                 current_light = not current_light
             message = {
                 'parameters': {
-                    'channel': self.light_pin
+                    'channel': self.light["channel"]
                 },
-                'targets': [name],
+                'targets': [self.light["node_name"]],
                 'event': "channel.off" if current_light else "channel.on"
             }
 
             comm.send(message)
-
-
-def _decrease_time(time, seconds):
-    out = ["00", "00", "00", "00"]
-    step = [0, 24, 60, 60]
-    rest = 0
-    for idx in range(len(time) - 1, -1, -1):
-        if time[idx] is not None:
-            v = int(time[idx]) - seconds - rest
-            seconds = 0
-            rest = 0
-            if v < 0:
-                rest = 1
-                v += step[idx]
-
-            out[idx] = str(v).rjust(2, '0')
-
-    if out[0] == "-1":
-        out = ["00", "00", "00", "00"]
-
-    return out
-
-
-def _explode_time_left_regexp(time_left):
-    if time_left is None or time_left == "0" or time_left == "-":
-        return ["00", "00", "00"]
-    try:
-        match = re.match(r'(\d+d)*(\d+h)*(\d+m)*(\d+s)', time_left)
-        parts = match.groups()
-        days = (parts[0][:-1]).rjust(2, '0') if parts[0] is not None else '00'
-        hours = (parts[1][:-1]).rjust(2, '0') if parts[1] is not None else '00'
-        minutes = (parts[2][:-1]).rjust(2, '0') if parts[2] is not None else '00'
-        seconds = (parts[3][:-1]).rjust(2, '0') if parts[3] is not None else '00'
-    except TypeError as e:
-        print(">>", time_left)
-        raise e
-    except AttributeError as e:
-        print(">>", time_left)
-        raise e
-
-    return [days, hours, minutes, seconds]
-
-
-def _explode_time_left(time_left):
-    if time_left is None or time_left == "0" or time_left == "-":
-        return ["00", "00", "00"]
-    days = "0"
-    hours = "0"
-    minutes = "0"
-    seconds = "0"
-    value = ""
-    for letter in time_left:
-        if letter.isdigit():
-            value += letter
-        else:
-            if letter == "h":
-                hours = value
-            if letter == "m":
-                minutes = value
-            if letter == "s":
-                seconds = value
-            if letter == "d":
-                days = value
-            value = ""
-
-    return [days.rjust(2, '0'), hours.rjust(2, '0'), minutes.rjust(2, '0'), seconds.rjust(2, '0')]

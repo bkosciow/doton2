@@ -42,7 +42,6 @@ class WindowManager(threading.Thread):
     def click(self, point):
         """store touch point"""
         self.point = point
-        print(point)
 
     def _handle_touch(self):
         point = self.point
@@ -50,7 +49,6 @@ class WindowManager(threading.Thread):
         if point is None:
             return
 
-        print("parsing touch")
         for widgets in self.widgets:
             for panel in self.widgets[widgets]:
                 if isinstance(panel.widget, Clickable) and \

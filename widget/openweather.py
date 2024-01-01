@@ -299,7 +299,7 @@ class Openweather(Widget):
         elif 326.25 <= degree < 348.75:
             return 'NNW'
 
-    def update_values(self, values):
+    def update_values(self, values, name=""):
         try:
             if values is None:
                 logger.error('weather null')

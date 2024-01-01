@@ -14,7 +14,6 @@ from gfxlcd_fonts import numbers_15x28_blue
 from gfxlcd_fonts import numbers_12x25
 from display.window_manager import WindowManager
 from service.config import Config
-# from connector.listener import Listener
 from socket_conn.listener import Listener
 import service.comm as comm
 from service.exceptions import *
@@ -41,7 +40,6 @@ FONTS = {
 
 comm.address = (config.get("message.ip"), int(config.get("message.port")))
 
-# listener = Listener(config.get('grpc.address'))
 listener = Listener(config.get('socket.address'))
 window_manager = WindowManager(config.lcd, config.init_touch)
 
@@ -54,39 +52,43 @@ listener.add_widget('node-kitchen', kitchenNode)
 
 northNode = NodeOne(FONTS['24x42'])
 northNode.colours['background'] = (0, 100, 150)
-window_manager.add_widget('node-north', northNode, 220, 0)
-listener.add_widget('node-north', northNode)
+window_manager.add_widget('node-lib', northNode, 220, 0)
+listener.add_widget('node-lib', northNode)
 
 livingNode = NodeOne(FONTS['24x42'])
 livingNode.colours['background'] = (100, 100, 150)
 window_manager.add_widget('node-living', livingNode, 330, 0)
 listener.add_widget('node-living', livingNode)
 
-openweatherNode = Openweather([0, 1, 2], FONTS)
-window_manager.add_widget('openweather', openweatherNode, 0, 107)
+openweatherNode = Openweather([0, 1], FONTS)
+window_manager.add_widget('openweather', openweatherNode, 110, 107)
 listener.add_widget('openweather', openweatherNode)
-
-'Bielsko-Biała, ul. Kossak-Szczuckiej 19'
-'Bielsko-Biała, ul.Partyzantów'
-
+# #
+# # 'Bielsko-Biała, ul. Kossak-Szczuckiej 19'
+# # 'Bielsko-Biała, ul.Partyzantów'
+# #
 openAqNode = OpenAQ() #['Bielsko-Biała, ul.Partyzantów'])
 window_manager.add_widget('openaq', openAqNode, 0, 50)
 listener.add_widget('openaq', openAqNode)
 
-cr6Node = Printer3d(FONTS['12x25'])
-cr6Node.colours['border'] = (0, 0, 255)
-window_manager.add_widget('node-ce6cr', cr6Node, 110, 214)
-listener.add_widget('node-ce6cr', cr6Node)
+# cr6Node = Printer3d(FONTS['12x25'])
+# cr6Node.colours['border'] = (0, 0, 255)
+# window_manager.add_widget('node-ce6cr', cr6Node, 110, 214)
+# listener.add_widget('node-ce6cr', cr6Node)
 
-# Dummy3dNode = Printer3d(FONTS['12x25'])
-# window_manager.add_widget('DummyPrinter', Dummy3dNode, 110, 200)
-# listener.add_widget('DummyPrinter', Dummy3dNode)
+ender5proNode = Printer3d(FONTS['12x25'], light_node_name="node-relaybox2", light_channel=1, power_node_name="node-relaybox2", power_channel=3)
+ender5proNode.colours['border'] = (0, 0, 0)
+window_manager.add_widget('ender5pro', ender5proNode, 220, 214)
+listener.add_widget('ender5pro', ender5proNode)
+listener.add_widget("node-relaybox2", ender5proNode)
+listener.add_widget("node-printers", ender5proNode)
 
-ender5proNode = Printer3d(FONTS['12x25'], 1, 0)
-ender5proNode.reverse_commands = True
-ender5proNode.colours['border'] = (255, 165, 0)
-window_manager.add_widget('node-ender5pro', ender5proNode, 0, 214)
-listener.add_widget('node-ender5pro', ender5proNode)
+ender5plusNode = Printer3d(FONTS['12x25'], light_node_name="node-printers", light_channel=3, power_node_name="node-printers", power_channel=1)
+ender5plusNode.colours['border'] = (255, 165, 0)
+window_manager.add_widget('ender5plus', ender5plusNode, 330, 214)
+listener.add_widget('ender5plus', ender5plusNode)
+listener.add_widget("node-relaybox2", ender5plusNode)
+listener.add_widget("node-printers", ender5plusNode)
 
 try:
     listener.start()
