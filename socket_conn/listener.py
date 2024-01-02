@@ -2,7 +2,9 @@ import json
 from threading import Thread
 import socket
 import regex
+import logging
 
+logger = logging.getLogger(__name__)
 
 class Listener(Thread):
     def __init__(self, address):
@@ -59,18 +61,18 @@ class Listener(Thread):
                                 key = list(response)[0]
                                 self._dispatch_data(key, response[key])
                         except ValueError as e:
-                            print("failed to unjonsonify")
-                            print(data)
-                            print(e)
+                            logger.error("failed to unjonsonify")
+                            logger.error(data)
+                            logger.error(str(e))
                     else:
                         self.work = False
                         self.connection_error = True
 
             except socket.error as e:
-                print("socket crash")
+                logger.error("socket closed")
                 self.work = False
                 self.connection_error = True
-                print(e)
+                logger.error(e)
 
     def _decode_data(self, data):
         parsed_data = self.pattern.findall(data)
@@ -85,6 +87,7 @@ class Listener(Thread):
 
     def stop(self):
         self.work = False
+        self.socket.close()
 
     def add_widget(self, name, widget):
         if name not in self.widgets:

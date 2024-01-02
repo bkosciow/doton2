@@ -21,8 +21,8 @@ import logging
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(module)s - %(message)s',
-    filename='doton.log',
-    level=logging.DEBUG
+    # filename='doton.log',
+    level=logging.INFO
 )
 logging.debug('Starting')
 
@@ -63,10 +63,7 @@ listener.add_widget('node-living', livingNode)
 openweatherNode = Openweather([0, 1], FONTS)
 window_manager.add_widget('openweather', openweatherNode, 110, 107)
 listener.add_widget('openweather', openweatherNode)
-# #
-# # 'Bielsko-Biała, ul. Kossak-Szczuckiej 19'
-# # 'Bielsko-Biała, ul.Partyzantów'
-# #
+
 openAqNode = OpenAQ() #['Bielsko-Biała, ul.Partyzantów'])
 window_manager.add_widget('openaq', openAqNode, 0, 50)
 listener.add_widget('openaq', openAqNode)
@@ -102,8 +99,10 @@ try:
 except KeyboardInterrupt:
     logging.debug('Closing')
 except:
+    logging.debug('Exception')
     raise
 finally:
+    logging.debug('finally')
     window_manager.stop()
     window_manager.join()
 
