@@ -93,9 +93,9 @@ try:
 
     while True:
         time.sleep(1)
-        if listener.connection_error:
-            window_manager.crash()
-            raise ConnectionLost()
+        # if listener.connection_error:
+        #     window_manager.crash()
+        #     raise ConnectionLost()
 except KeyboardInterrupt:
     logging.debug('Closing')
 except:

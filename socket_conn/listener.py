@@ -3,8 +3,10 @@ from threading import Thread
 import socket
 import regex
 import logging
+import time
 
 logger = logging.getLogger(__name__)
+
 
 class Listener(Thread):
     def __init__(self, address):
@@ -18,6 +20,7 @@ class Listener(Thread):
         self._connect()
 
     def _connect(self):
+        logger.info("Connecting to " + self.address)
         (addr, port) = self.address.split(":")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # host = socket.gethostname()
@@ -65,14 +68,30 @@ class Listener(Thread):
                             logger.error(data)
                             logger.error(str(e))
                     else:
-                        self.work = False
+                        # self.work = False
                         self.connection_error = True
+                        if self.work:
+                            self._reconnect()
 
             except socket.error as e:
                 logger.error("socket closed")
-                self.work = False
+                # self.work = False
                 self.connection_error = True
-                logger.error(e)
+                if self.work:
+                    self._reconnect()
+
+                logger.error(str(e))
+
+    def _reconnect(self):
+        logger.info("Connection lost, reconnecting")
+        time.sleep(1)
+        try:
+            self._connect()
+            logger.info("Connection restored")
+            time.sleep(1)
+            self._initialize_values()
+        except ConnectionRefusedError:
+            time.sleep(2)
 
     def _decode_data(self, data):
         parsed_data = self.pattern.findall(data)

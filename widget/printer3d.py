@@ -157,7 +157,8 @@ class Printer3d(Widget, Clickable):
                 if 'status' in values:
                     if values['flags']['printing'] or values['flags']['pausing'] or values['flags']['paused']:
                         self.current['status'] = "printing"
-                        self.current['percentage'] = round(values['print']['completion'])
+                        if 'print' in values and 'completion' in values['print']:
+                            self.current['percentage'] = round(values['print']['completion'])
                         self.current['timeLeft'] = str(timedelta(seconds=values['print']['printTimeLeft'])).split(':')[:2]
                         self.current['timeLeft'][0] = self.current['timeLeft'][0].rjust(3, '0')
                         self.current['timeLeft'][1] = self.current['timeLeft'][1].rjust(2, '0')
