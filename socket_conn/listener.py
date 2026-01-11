@@ -17,13 +17,12 @@ class Listener(Thread):
         self.connection_error = False
         self.pattern = regex.compile(r'\{(?:[^{}]|(?R))*\}')
         self.start_message = regex.compile(r'\d+:{')
-        self._connect()
+        # self._connect()
 
     def _connect(self):
         logger.info("Connecting to " + self.address)
         (addr, port) = self.address.split(":")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # host = socket.gethostname()
         self.socket.connect((addr, int(port)))
 
     def _recv(self):
@@ -52,6 +51,7 @@ class Listener(Thread):
                 yield None
 
     def run(self):
+        self._connect()
         self._initialize_values()
         while self.work:
             try:
@@ -68,29 +68,34 @@ class Listener(Thread):
                             logger.error(data)
                             logger.error(str(e))
                     else:
-                        # self.work = False
                         self.connection_error = True
                         if self.work:
                             self._reconnect()
+                        # self.work = False
 
             except socket.error as e:
-                logger.error("socket closed")
-                # self.work = False
+                logger.error("socket crash")
                 self.connection_error = True
                 if self.work:
                     self._reconnect()
-
+                # self.work = False
                 logger.error(str(e))
 
     def _reconnect(self):
-        logger.info("Connection lost, reconnecting")
+        logger.info("Listener: Connection lost, reconnecting")
         time.sleep(1)
         try:
             self._connect()
-            logger.info("Connection restored")
+            logger.info("Listener: Connection restored")
             time.sleep(1)
             self._initialize_values()
-        except ConnectionRefusedError:
+        except ConnectionRefusedError as e:
+            logger.error(str(e))
+            logger.info('reconnecting...')
+            time.sleep(2)
+        except socket.error as e:
+            logger.error(str(e))
+            logger.info('reconnecting...')
             time.sleep(2)
 
     def _decode_data(self, data):

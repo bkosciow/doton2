@@ -125,10 +125,10 @@ class NodeOne(Widget, Clickable):
         # if not self.initialized:
         #     return
         if 'temp' in values:
-            self.current['temperature'] = values['temp']
+            self.current['temperature'] = round(float(values['temp']))
 
         if 'humi' in values:
-            self.current['humidity'] = values['humi']
+            self.current['humidity'] = round(float(values['humi']))
 
         if 'pir' in values:
             self.current['movement'] = values['pir']

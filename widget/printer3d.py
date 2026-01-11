@@ -159,10 +159,11 @@ class Printer3d(Widget, Clickable):
                         self.current['status'] = "printing"
                         if 'print' in values and 'completion' in values['print']:
                             self.current['percentage'] = round(values['print']['completion'])
-                        self.current['timeLeft'] = str(timedelta(seconds=values['print']['printTimeLeft'])).split(':')[:2]
-                        self.current['timeLeft'][0] = self.current['timeLeft'][0].rjust(3, '0')
-                        self.current['timeLeft'][1] = self.current['timeLeft'][1].rjust(2, '0')
-                        if float(values['print']['completion']) > 99.8:
+                        if isinstance(values['print'], dict) and isinstance(values['print']['printTimeLeft'], int):
+                            self.current['timeLeft'] = str(timedelta(seconds=values['print']['printTimeLeft'])).split(':')[:2]
+                            self.current['timeLeft'][0] = self.current['timeLeft'][0].rjust(3, '0')
+                            self.current['timeLeft'][1] = self.current['timeLeft'][1].rjust(2, '0')
+                        if isinstance(values['print'], dict) and 'completion' in values['print'] and float(values['print']['completion']) > 99.8:
                             self.current['status'] = "printed"
                     else:
                         self.current['percentage'] = 0
